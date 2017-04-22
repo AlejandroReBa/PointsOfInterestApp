@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">PointsOfInterestApp</string>
+    <string name="addpoi">Add a new POI</string>
+    <string name="poiname">Name</string>
+    <string name="poitype">Type</string>
+    <string name="poidescription">Description</string>
+    <string name="poilat">Latitude</string>
+    <string name="poilong">Longitude</string>
+    <string name="addpoibutton">Add!</string>
+    <string name="backaddpoibutton">Come back to the map</string>
+
+    <string-array name="poi_types">
+        <item>hotel</item>
+        <item>city</item>
+        <item>town</item>
+        <item>historical site</item>
+        <item>bar</item>
+        <item>restaurant</item>
+        <item>beach</item>
+        <item>mountain</item>
+        <item>pub</item>
+    </string-array>
 </resources>
