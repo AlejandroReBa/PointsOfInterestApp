@@ -1,6 +1,7 @@
 package xyz.alejandoreba.pointsofinterestapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
@@ -36,7 +37,8 @@ public class MainActivity extends Activity implements LocationListener {
         try {
             mgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         }catch(SecurityException ex){
-
+            new AlertDialog.Builder(this).setMessage("ERROR: we need permission for track your position").
+                    setPositiveButton("OK", null).show();
         }
     }
 
