@@ -8,7 +8,11 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import org.osmdroid.config.Configuration;
@@ -22,13 +26,19 @@ import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends Activity implements LocationListener {
 
-    MapView mv;
-    ItemizedIconOverlay<OverlayItem> items;
-    MyLocationNewOverlay mLocationOverlay;
+    private MapView mv;
+    private ItemizedIconOverlay<OverlayItem> items;
+    private List<PointOfInterest> POIsList;
+    private MyLocationNewOverlay mLocationOverlay;
+    private static final String POIsListFileName = "pois.csv";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +51,10 @@ public class MainActivity extends Activity implements LocationListener {
         setContentView(R.layout.activity_main);
         mv = (MapView) findViewById(R.id.map1);
 
+        //initialize the list of Points of Interest
+        this.POIsList = new ArrayList<>();
 
-        //initialize the list of items (POIs) over the map
+        //initialize the list of OverlayItems (POIs) over the map
          this.items = new ItemizedIconOverlay<OverlayItem>(this, new ArrayList<OverlayItem>(), null);
 
         //add the MyLocation Overlay to track the position of the user
@@ -129,6 +141,46 @@ public class MainActivity extends Activity implements LocationListener {
                 " disabled", Toast.LENGTH_LONG).show();
     }
 
+    //methods to inflate the menu and manage the start
+    //of the distinct activities displayed in the menu
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        if(item.getItemId() == R.id.addpoi)
+        {
+            //System.exit(0);
+            Intent intent = new Intent (this, addPOI.class);
+            Bundle bundle = new Bundle();
+            //add a POI where the map is centered
+            //bundle.putDouble("poilat", this.mv.getMapCenter().getLatitude());
+            //bundle.putDouble("poilon", this.mv.getMapCenter().getLongitude());
+            //add a POI where the gps track the user is.
+            if(this.mLocationOverlay.getMyLocation() != null) {
+                bundle.putDouble("poilat", this.mLocationOverlay.getMyLocation().getLatitude());
+                bundle.putDouble("poilon", this.mLocationOverlay.getMyLocation().getLongitude());
+                intent.putExtras(bundle);
+                startActivityForResult(intent, 0);
+                return true;
+            }else{
+                Toast.makeText(this, "It's not possible to add a new POI because we couldn't find your location",
+                        Toast.LENGTH_LONG).show();
+                return false;
+            }
+        }else if (item.getItemId() == R.id.savepois){
+            savePOIs(POIsListFileName, this.POIsList);
+            return true;
+        }
+        return false;
+    }
+
     //method to manage results of activities.
     @Override
     protected void onActivityResult(int requestCode,int resultCode,Intent intent)
@@ -151,7 +203,8 @@ public class MainActivity extends Activity implements LocationListener {
                         Toast.LENGTH_LONG).show();
 
 
-                OverlayItem newItem = new OverlayItem(name,type,description, new GeoPoint(lat,lon));
+                this.POIsList.add(new PointOfInterest(name,type,description,lat,lon));
+                OverlayItem newItem = new OverlayItem(name,type + description, new GeoPoint(lat,lon));
                 items.addItem(newItem);
                 mv.getOverlays().add(items);
                 //refresh the map in order to show the new POI immediately
@@ -161,5 +214,32 @@ public class MainActivity extends Activity implements LocationListener {
 
         }
     }
+
+    private void savePOIs(String fileName, List<PointOfInterest> list){
+        String savedText = "";
+        for (PointOfInterest poi : list) {
+            savedText += poi.getName() + "," + poi.getType() + ",\"" + poi.getDescription() + "\"," + poi.getLat() + "," + poi.getLon() + "\n";
+        }
+        try
+        {
+            PrintWriter pw =
+                    new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + fileName));
+            pw.println(savedText);
+            pw.close(); // close the file to ensure data is flushed to file
+            Toast.makeText(this, "POIs has been saved into the file " + fileName,
+                    Toast.LENGTH_LONG).show();
+        }
+        catch(IOException e)
+        {
+            new AlertDialog.Builder(this).setMessage("ERROR: seems to have been a problem saving the POIs").
+                    setPositiveButton("OK", null).show();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        savePOIs(POIsListFileName, POIsList);
+    }
+
 }
 

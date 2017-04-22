@@ -20,4 +20,6 @@
         <item>mountain</item>
         <item>pub</item>
     </string-array>
+
+    <string name="savepois">Save POIs</string>
 </resources>
