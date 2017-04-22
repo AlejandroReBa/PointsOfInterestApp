@@ -19,6 +19,8 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
 
@@ -26,6 +28,7 @@ public class MainActivity extends Activity implements LocationListener {
 
     MapView mv;
     ItemizedIconOverlay<OverlayItem> items;
+    MyLocationNewOverlay mLocationOverlay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,11 @@ public class MainActivity extends Activity implements LocationListener {
         //initialize the list of items (POIs) over the map
          this.items = new ItemizedIconOverlay<OverlayItem>(this, new ArrayList<OverlayItem>(), null);
 
+        //add the MyLocation Overlay to track the position of the user
+        this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mv);
+        this.mLocationOverlay.enableMyLocation();
+        mv.getOverlays().add(this.mLocationOverlay);
+
         //listener for tap clicks on the map
         //when you click you intend the new activity to add a POI
         MapEventsReceiver eventsReceiver = new MapEventsReceiver() {
@@ -51,7 +59,20 @@ public class MainActivity extends Activity implements LocationListener {
                 Toast.makeText (MainActivity.this, "singleTapConfirmedHelper go go go -> lat:" + p.getLatitude() + " , long: " + p.getLongitude(), Toast.LENGTH_LONG).show();
                 return false;
                 */
+                /*
+                Intent intent = new Intent(MainActivity.this, addPOI.class);
+                Bundle bundle = new Bundle();
+                bundle.putDouble("poilat", p.getLatitude());
+                bundle.putDouble("poilon", p.getLongitude());
+                intent.putExtras(bundle);
+                startActivityForResult(intent, 0);
+                */
+                return false;
+            }
 
+            @Override
+            public boolean longPressHelper(GeoPoint p) {
+                //Toast.makeText (MainActivity.this, "longPressHelper go go go", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(MainActivity.this, addPOI.class);
                 Bundle bundle = new Bundle();
                 bundle.putDouble("poilat", p.getLatitude());
@@ -59,13 +80,7 @@ public class MainActivity extends Activity implements LocationListener {
                 intent.putExtras(bundle);
                 startActivityForResult(intent, 0);
 
-                return false;
-            }
-
-            @Override
-            public boolean longPressHelper(GeoPoint p) {
-                Toast.makeText (MainActivity.this, "longPressHelper go go go", Toast.LENGTH_LONG).show();
-                return false;
+                return true;
             }
         };
 
