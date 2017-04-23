@@ -27,6 +27,8 @@ import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -183,6 +185,10 @@ public class MainActivity extends Activity implements LocationListener {
             Intent intent = new Intent (this, MyPrefsActivity.class);
             startActivityForResult(intent, 1);
             return true;
+            //task 5
+        }else if (item.getItemId() == R.id.loadpois) {
+            loadPOIs(POIsListFileName, this.POIsList);
+            return true;
         }
         return false;
     }
@@ -228,6 +234,7 @@ public class MainActivity extends Activity implements LocationListener {
         }
     }
 
+    //task 3
     private void savePOIs(String fileName, List<PointOfInterest> list){
         String savedText = "";
         for (PointOfInterest poi : list) {
@@ -239,7 +246,7 @@ public class MainActivity extends Activity implements LocationListener {
                     new PrintWriter(new FileWriter(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + fileName));
             pw.println(savedText);
             pw.close(); // close the file to ensure data is flushed to file
-            Toast.makeText(this, "POIs has been saved into the file " + fileName,
+            Toast.makeText(this, "POIs have been saved into file " + fileName,
                     Toast.LENGTH_LONG).show();
         }
         catch(IOException e)
@@ -249,6 +256,50 @@ public class MainActivity extends Activity implements LocationListener {
         }
     }
 
+    //task 5
+    private void loadPOIs(String fileName, List<PointOfInterest> list){
+        try
+        {
+            FileReader fr = new FileReader(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + fileName);
+            BufferedReader reader = new BufferedReader(fr);
+            //clean the list of POIs
+            list.clear();
+            String line = "";
+            while((line = reader.readLine()) != null)
+            {
+                String[] components = line.split(",");
+                if(components.length == 5)
+                {
+                    PointOfInterest currentPOI = new PointOfInterest (components[0], components[1], components[2], Double.parseDouble(components[3]), Double.parseDouble(components[4]));
+                    list.add(currentPOI);
+                }
+            }
+            reader.close();
+            displayPOIs(list);
+            Toast.makeText(this, "POIs have been loaded from file " + POIsListFileName,
+                    Toast.LENGTH_LONG).show();
+        }
+        catch(IOException e)
+        {
+            new AlertDialog.Builder(this).setMessage("ERROR: seems to have been a problem reading in the POIs from file " + fileName).
+                    setPositiveButton("OK", null).show();
+
+        }
+    }
+
+    //task 5
+    public void displayPOIs(List<PointOfInterest> list){
+        this.items.removeAllItems();
+        for (PointOfInterest poi : list){
+            OverlayItem newItem = new OverlayItem(poi.getName(), poi.getType() + poi.getDescription(), new GeoPoint(poi.getLat(),poi.getLon()));
+            //setMarker(newItem,type);
+            items.addItem(newItem);
+        }
+        mv.getOverlays().add(items);
+        mv.invalidate();
+    }
+
+    //task 3
     @Override
     protected void onDestroy() {
         super.onDestroy();
