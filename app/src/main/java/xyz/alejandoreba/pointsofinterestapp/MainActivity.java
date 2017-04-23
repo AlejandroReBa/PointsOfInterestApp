@@ -238,6 +238,7 @@ public class MainActivity extends Activity implements LocationListener {
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         savePOIs(POIsListFileName, POIsList);
     }
 
