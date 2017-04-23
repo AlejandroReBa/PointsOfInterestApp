@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -16,6 +17,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.util.GeoPoint;
@@ -31,7 +35,11 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -189,6 +197,11 @@ public class MainActivity extends Activity implements LocationListener {
         }else if (item.getItemId() == R.id.loadpois) {
             loadPOIs(POIsListFileName, this.POIsList);
             return true;
+            //task 6
+        }else if (item.getItemId() == R.id.loadpoisfromweb) {
+            MyTask task = new MyTask();
+            task.execute();
+            return true;
         }
         return false;
     }
@@ -304,6 +317,72 @@ public class MainActivity extends Activity implements LocationListener {
     protected void onDestroy() {
         super.onDestroy();
         savePOIs(POIsListFileName, POIsList);
+    }
+
+
+    //task 6
+    //class MyTask extends AsyncTask<Void,Void,String>
+    private class MyTask extends AsyncTask<String,Void,String>
+    {
+        //public String doInBackground(Void... unused)
+        public String doInBackground(String... components)
+        {
+            HttpURLConnection conn = null;
+            try
+            {
+                    //URL url = new URL("http://www.free-map.org.uk/course/mad/ws/get.php?year=17&username=user002&format=json ");
+                    String urlstring = "http://www.free-map.org.uk/course/mad/ws/get.php?year=17&username=user002&format=json";
+                    URL url = new URL(urlstring);
+
+                    conn = (HttpURLConnection) url.openConnection();
+                    InputStream in = conn.getInputStream();
+                    if (conn.getResponseCode() == 200) {
+                        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+                        String result = "", line;
+                        while ((line = br.readLine()) != null)
+                            result += line;
+
+                        JSONArray jsonArr = new JSONArray(result);
+                        String name, type, description;
+                        Double lat, lon;
+
+                        POIsList.clear();
+                        for (int i = 0; i < jsonArr.length(); i++) {
+                            JSONObject currentObject = jsonArr.getJSONObject(i);
+                            name = currentObject.getString("name");
+                            type = currentObject.getString("type");
+                            description = currentObject.getString("description");
+                            lat = currentObject.getDouble("lat");
+                            lon = currentObject.getDouble("lon");
+
+                            POIsList.add(new PointOfInterest(name, type, description, lat, lon));
+                        }
+
+                        return "POIs have been loaded from the web successfully";
+                    } else {
+                        return "HTTP ERROR: " + conn.getResponseCode();
+                    }
+            }
+            catch(IOException e)
+            {
+                return e.toString();
+            }
+            catch (JSONException e){
+                return e.toString();
+            }
+            finally
+            {
+                if(conn!=null)
+                    conn.disconnect();
+            }
+        }
+
+        public void onPostExecute(String result)
+        {
+            displayPOIs(POIsList);
+            Toast.makeText(MainActivity.this, result,
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
 }
