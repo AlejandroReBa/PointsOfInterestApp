@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--task 4-->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference android:key="uploadweb" android:defaultValue="NO" android:title="Upload POIs" android:summary="Upload new POIs added to the web"
+        android:entries="@array/uploadWebOptions" android:entryValues="@array/uploadWebOptions" />
+</PreferenceScreen>

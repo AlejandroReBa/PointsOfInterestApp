@@ -1,4 +1,5 @@
 <resources>
+    <!--task 2-->
     <string name="app_name">PointsOfInterestApp</string>
     <string name="addpoi">Add a new POI</string>
     <string name="poiname">Name</string>
@@ -21,5 +22,15 @@
         <item>pub</item>
     </string-array>
 
+    <!--task 3-->
     <string name="savepois">Save POIs</string>
+
+    <!--task 4-->
+    <string-array name="uploadWebOptions">
+        <item>YES</item>
+        <item>NO</item>
+    </string-array>
+
+    <string name="prefsactivity">Preferences</string>
+
 </resources>

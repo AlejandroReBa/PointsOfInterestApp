@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -177,6 +178,11 @@ public class MainActivity extends Activity implements LocationListener {
         }else if (item.getItemId() == R.id.savepois){
             savePOIs(POIsListFileName, this.POIsList);
             return true;
+            //task 4
+        }else if (item.getItemId() == R.id.prefsactivity){
+            Intent intent = new Intent (this, MyPrefsActivity.class);
+            startActivityForResult(intent, 1);
+            return true;
         }
         return false;
     }
@@ -202,7 +208,14 @@ public class MainActivity extends Activity implements LocationListener {
                         ", lat: " + lat + ", lon: " + lon + " description: " + description,
                         Toast.LENGTH_LONG).show();
 
+                //task 4
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                String uploadToWeb = prefs.getString("uploadWebOptions","NO");
+                if (uploadToWeb == "YES"){
+                    //To do, code to upload the new POI to the web
+                }
 
+                //task 2
                 this.POIsList.add(new PointOfInterest(name,type,description,lat,lon));
                 OverlayItem newItem = new OverlayItem(name,type + description, new GeoPoint(lat,lon));
                 items.addItem(newItem);
