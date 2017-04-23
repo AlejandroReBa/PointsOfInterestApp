@@ -37,6 +37,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -200,7 +201,7 @@ public class MainActivity extends Activity implements LocationListener {
             //task 6
         }else if (item.getItemId() == R.id.loadpoisfromweb) {
             MyTask task = new MyTask();
-            task.execute();
+            task.execute("load");
             return true;
         }
         return false;
@@ -222,18 +223,6 @@ public class MainActivity extends Activity implements LocationListener {
                 double lat = extras.getDouble("poilat");
                 double lon = extras.getDouble("poilon");
 
-
-                Toast.makeText(this, "POI virtually added -> name: " + name + ", type: " + type +
-                        ", lat: " + lat + ", lon: " + lon + " description: " + description,
-                        Toast.LENGTH_LONG).show();
-
-                //task 4
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                String uploadToWeb = prefs.getString("uploadWebOptions","NO");
-                if (uploadToWeb == "YES"){
-                    //To do, code to upload the new POI to the web
-                }
-
                 //task 2
                 this.POIsList.add(new PointOfInterest(name,type,description,lat,lon));
                 OverlayItem newItem = new OverlayItem(name,type + description, new GeoPoint(lat,lon));
@@ -242,6 +231,18 @@ public class MainActivity extends Activity implements LocationListener {
                 //refresh the map in order to show the new POI immediately
                 mv.invalidate();
 
+                Toast.makeText(this, "POI added -> name: " + name + ", type: " + type +
+                                ", lat: " + lat + ", lon: " + lon + " description: " + description,
+                        Toast.LENGTH_LONG).show();
+
+                //task 4
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                String uploadToWeb = prefs.getString("uploadweb","NO");
+                if (uploadToWeb.equals("YES")){
+                    //task 7
+                    MyTask task = new MyTask();
+                    task.execute("add", name, type, description, String.valueOf(lat), String.valueOf(lon));
+                }
             }
 
         }
@@ -320,16 +321,17 @@ public class MainActivity extends Activity implements LocationListener {
     }
 
 
-    //task 6
+    //task 6, task 7
     //class MyTask extends AsyncTask<Void,Void,String>
     private class MyTask extends AsyncTask<String,Void,String>
     {
         //public String doInBackground(Void... unused)
-        public String doInBackground(String... components)
+        public String doInBackground(String... params)
         {
             HttpURLConnection conn = null;
             try
-            {
+            {   //task 6
+                if (params[0] != null && params[0] == "load") {
                     //URL url = new URL("http://www.free-map.org.uk/course/mad/ws/get.php?year=17&username=user002&format=json ");
                     String urlstring = "http://www.free-map.org.uk/course/mad/ws/get.php?year=17&username=user002&format=json";
                     URL url = new URL(urlstring);
@@ -362,6 +364,24 @@ public class MainActivity extends Activity implements LocationListener {
                     } else {
                         return "HTTP ERROR: " + conn.getResponseCode();
                     }
+                }else{ //task 7
+                    String urlstring = "http://www.free-map.org.uk/course/mad/ws/add.php";
+                    URL url = new URL(urlstring);
+                    String postData = "username=user002&name=" + params[1] + "&type=" + params[2] + "&description=" + params[3]
+                            + "&lat=" + params[4] + "&lon=" + params[5] + "&year=17";
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setDoOutput(true);
+                    conn.setFixedLengthStreamingMode(postData.length());
+                    OutputStream out = null;
+                    out = conn.getOutputStream();
+                    out.write(postData.getBytes());
+                    InputStream in = conn.getInputStream();
+                    if (conn.getResponseCode() == 200) {
+                        return "POI has been added to the web sucessfully";
+                    } else {
+                        return "HTTP ERROR: " + conn.getResponseCode();
+                    }
+                }
             }
             catch(IOException e)
             {
