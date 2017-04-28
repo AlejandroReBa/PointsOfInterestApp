@@ -172,9 +172,11 @@ public class MainActivity extends Activity implements LocationListener {
             Intent intent = new Intent (this, addPOI.class);
             Bundle bundle = new Bundle();
             //add a POI where the map is centered
-            //bundle.putDouble("poilat", this.mv.getMapCenter().getLatitude());
-            //bundle.putDouble("poilon", this.mv.getMapCenter().getLongitude());
+            bundle.putDouble("poilat", this.mv.getMapCenter().getLatitude());
+            bundle.putDouble("poilon", this.mv.getMapCenter().getLongitude());
+            return true;
             //add a POI where the gps track the user is.
+            /*
             if(this.mLocationOverlay.getMyLocation() != null) {
                 bundle.putDouble("poilat", this.mLocationOverlay.getMyLocation().getLatitude());
                 bundle.putDouble("poilon", this.mLocationOverlay.getMyLocation().getLongitude());
@@ -186,6 +188,7 @@ public class MainActivity extends Activity implements LocationListener {
                         Toast.LENGTH_LONG).show();
                 return false;
             }
+            */
         }else if (item.getItemId() == R.id.savepois){
             savePOIs(POIsListFileName, this.POIsList);
             return true;
