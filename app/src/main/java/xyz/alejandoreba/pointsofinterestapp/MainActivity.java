@@ -174,6 +174,8 @@ public class MainActivity extends Activity implements LocationListener {
             //add a POI where the map is centered
             bundle.putDouble("poilat", this.mv.getMapCenter().getLatitude());
             bundle.putDouble("poilon", this.mv.getMapCenter().getLongitude());
+            intent.putExtras(bundle);
+            startActivityForResult(intent, 0);
             return true;
             //add a POI where the gps track the user is.
             /*
