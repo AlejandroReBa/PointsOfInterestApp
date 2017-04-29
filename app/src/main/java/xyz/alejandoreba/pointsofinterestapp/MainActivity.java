@@ -44,12 +44,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends Activity implements LocationListener {
+public class MainActivity extends Activity implements POIsInterface {
 
-    private MapView mv;
-    private ItemizedIconOverlay<OverlayItem> items;
-    private List<PointOfInterest> POIsList;
-    private MyLocationNewOverlay mLocationOverlay;
+    //private MapView mv;
+    //private ItemizedIconOverlay<OverlayItem> items;
+    private ArrayList<PointOfInterest> POIsList;
+    //private MyLocationNewOverlay mLocationOverlay;
     private static final String POIsListFileName = "pois.csv";
 
     @Override
@@ -61,36 +61,25 @@ public class MainActivity extends Activity implements LocationListener {
 
         //set map, zoom and center
         setContentView(R.layout.activity_main);
-        mv = (MapView) findViewById(R.id.map1);
+        //mv = (MapView) findViewById(R.id.map1);
 
         //initialize the list of Points of Interest
         this.POIsList = new ArrayList<>();
 
         //initialize the list of OverlayItems (POIs) over the map
-         this.items = new ItemizedIconOverlay<OverlayItem>(this, new ArrayList<OverlayItem>(), null);
+         //this.items = new ItemizedIconOverlay<OverlayItem>(this, new ArrayList<OverlayItem>(), null);
 
         //add the MyLocation Overlay to track the position of the user
-        this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mv);
-        this.mLocationOverlay.enableMyLocation();
-        mv.getOverlays().add(this.mLocationOverlay);
+       // this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), mv);
+       // this.mLocationOverlay.enableMyLocation();
+       // mv.getOverlays().add(this.mLocationOverlay);
 
         //listener for tap clicks on the map
         //when you click you intend the new activity to add a POI
+        /*
         MapEventsReceiver eventsReceiver = new MapEventsReceiver() {
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p) {
-                /*
-                Toast.makeText (MainActivity.this, "singleTapConfirmedHelper go go go -> lat:" + p.getLatitude() + " , long: " + p.getLongitude(), Toast.LENGTH_LONG).show();
-                return false;
-                */
-                /*
-                Intent intent = new Intent(MainActivity.this, addPOI.class);
-                Bundle bundle = new Bundle();
-                bundle.putDouble("poilat", p.getLatitude());
-                bundle.putDouble("poilon", p.getLongitude());
-                intent.putExtras(bundle);
-                startActivityForResult(intent, 0);
-                */
                 return false;
             }
 
@@ -111,12 +100,16 @@ public class MainActivity extends Activity implements LocationListener {
         Overlay eventsOnMap = new MapEventsOverlay(eventsReceiver);
         mv.getOverlays().add(eventsOnMap);
         //
+        */
 
+        /*
         //center and zoom the map
         mv.getController().setZoom(14);
         mv.setBuiltInZoomControls(true);
         mv.getController().setCenter(new GeoPoint(50.9319, -1.4011));
+        */
 
+        /*
         //check GPS service is on
         LocationManager mgr=(LocationManager)getSystemService(Context.LOCATION_SERVICE);
         try {
@@ -125,8 +118,10 @@ public class MainActivity extends Activity implements LocationListener {
             new AlertDialog.Builder(this).setMessage("ERROR: we need permission for track your position").
                     setPositiveButton("OK", null).show();
         }
+        */
     }
 
+    /*
     @Override
     public void onLocationChanged(Location newLoc) {
         Toast.makeText (this, "Location=" +
@@ -152,6 +147,7 @@ public class MainActivity extends Activity implements LocationListener {
         Toast.makeText(this, "Provider " + provider +
                 " disabled", Toast.LENGTH_LONG).show();
     }
+    */
 
     //methods to inflate the menu and manage the start
     //of the distinct activities displayed in the menu
@@ -168,12 +164,15 @@ public class MainActivity extends Activity implements LocationListener {
     public boolean onOptionsItemSelected(MenuItem item){
         if(item.getItemId() == R.id.addpoi)
         {
-            //System.exit(0);
             Intent intent = new Intent (this, addPOI.class);
             Bundle bundle = new Bundle();
             //add a POI where the map is centered
-            bundle.putDouble("poilat", this.mv.getMapCenter().getLatitude());
-            bundle.putDouble("poilon", this.mv.getMapCenter().getLongitude());
+            //bundle.putDouble("poilat", this.mv.getMapCenter().getLatitude());
+            //bundle.putDouble("poilon", this.mv.getMapCenter().getLongitude());
+            //changed at task8 because use of fragments
+            MapFragment mapFragment = (MapFragment)getFragmentManager().findFragmentById(R.id.mapFragment);
+            bundle.putDouble("poilat", mapFragment.getLatitude());
+            bundle.putDouble("poilon", mapFragment.getLongitude());
             intent.putExtras(bundle);
             startActivityForResult(intent, 0);
             return true;
@@ -208,6 +207,15 @@ public class MainActivity extends Activity implements LocationListener {
             MyTask task = new MyTask();
             task.execute("load");
             return true;
+            //task 8
+        }else if (item.getItemId() == R.id.listofpois){
+            //depends on the poiListFragment and mapFragment being in the same activity
+            Intent intent = new Intent (this, PoiListActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putParcelableArrayList("poiList", this.POIsList);
+            intent.putExtras(bundle);
+            startActivityForResult(intent, 2);
+            return true;
         }
         return false;
     }
@@ -228,8 +236,11 @@ public class MainActivity extends Activity implements LocationListener {
                 double lat = extras.getDouble("poilat");
                 double lon = extras.getDouble("poilon");
 
-                //task 2
+                //task 2 --> part of create overlayItem, mv.getOverlays().add(items) and mv.invalidate migrated to MapFragment
                 this.POIsList.add(new PointOfInterest(name,type,description,lat,lon));
+                MapFragment mapFragment = (MapFragment)getFragmentManager().findFragmentById(R.id.mapFragment);
+                mapFragment.addItem(name,type,description,lat,lon);
+                /*
                 OverlayItem newItem = new OverlayItem(name,type + description, new GeoPoint(lat,lon));
                 items.addItem(newItem);
                 mv.getOverlays().add(items);
@@ -239,6 +250,13 @@ public class MainActivity extends Activity implements LocationListener {
                 Toast.makeText(this, "POI added -> name: " + name + ", type: " + type +
                                 ", lat: " + lat + ", lon: " + lon + " description: " + description,
                         Toast.LENGTH_LONG).show();
+                */
+                //task 8
+                if (getResources().getConfiguration().orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE)
+                {
+                    PoiListFragment poiListFragment = (PoiListFragment) getFragmentManager().findFragmentById(R.id.poiListFragment);
+                    poiListFragment.createEntriesAndAdapter();
+                }
 
                 //task 4
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -249,7 +267,12 @@ public class MainActivity extends Activity implements LocationListener {
                     task.execute("add", name, type, description, String.valueOf(lat), String.valueOf(lon));
                 }
             }
-
+        //requestCode == 1 is not being used at the moment
+        }else if (requestCode==2){
+            if (resultCode==RESULT_OK) {
+                Bundle extras = intent.getExtras();
+                receiveLocation(extras.getDouble("latitude", 50.0), extras.getDouble("longitude", -0.5));
+            }
         }
     }
 
@@ -308,6 +331,8 @@ public class MainActivity extends Activity implements LocationListener {
 
     //task 5
     public void displayPOIs(List<PointOfInterest> list){
+        //modified for using inside fragments at task 8
+        /*
         this.items.removeAllItems();
         for (PointOfInterest poi : list){
             OverlayItem newItem = new OverlayItem(poi.getName(), poi.getType() + poi.getDescription(), new GeoPoint(poi.getLat(),poi.getLon()));
@@ -316,6 +341,21 @@ public class MainActivity extends Activity implements LocationListener {
         }
         mv.getOverlays().add(items);
         mv.invalidate();
+        */
+        MapFragment mapFragment = (MapFragment)getFragmentManager().findFragmentById(R.id.mapFragment);
+        mapFragment.removeItems();
+        for (PointOfInterest poi : list){
+            mapFragment.addItem(poi.getName(), poi.getType(), poi.getDescription(), poi.getLat(),poi.getLon());
+        }
+
+
+        //task 8
+        if (getResources().getConfiguration().orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE)
+        {
+            PoiListFragment poiListFragment = (PoiListFragment) getFragmentManager().findFragmentById(R.id.poiListFragment);
+            poiListFragment.createEntriesAndAdapter();
+        }
+
     }
 
     //task 3
@@ -408,6 +448,40 @@ public class MainActivity extends Activity implements LocationListener {
             Toast.makeText(MainActivity.this, result,
                     Toast.LENGTH_LONG).show();
         }
+    }
+
+    //task 8
+    public ArrayList<PointOfInterest> getPOIsList(){
+        return this.POIsList;
+    }
+
+    //task 8
+    public void receiveLocation (double latitude, double longitude)
+    {
+        MapFragment mapFragment = (MapFragment)getFragmentManager().findFragmentById(R.id.mapFragment);
+        // set its contents
+        mapFragment.centerMap(latitude, longitude);
+
+        /*
+        if (mapFragment == null || !mapFragment.isInLayout())
+        {
+            Intent intent = new Intent (this, SecondaryActivity.class);
+            intent.putExtra("latitude", latitude);
+            intent.putExtra("longitude", longitude);
+            startActivity(intent);
+        }
+        else
+        {
+        */
+            // set its contents
+           // mapFragment.centerMap(latitude, longitude);
+        //}
+
+    }
+
+    //when long click add a new POI within MapFragment-->this method is used to launch addPOI activity from here
+    public void startActivityUsingIntent(Intent intent, int code){
+        startActivityForResult(intent, code);
     }
 
 }

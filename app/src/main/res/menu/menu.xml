@@ -3,6 +3,7 @@
     <item android:title="@string/addpoi" android:id="@+id/addpoi" />
     <item android:title="@string/savepois" android:id="@+id/savepois" />
     <item android:title="Load POIs" android:id="@+id/loadpois" />
-    <item android:title="Load POIs from WEB" android:id="@+id/loadpoisfromweb" />
+    <item android:title="Load POIs from WEB" android:id="@+id/loadpoisfromweb"/>
+    <item android:title="List of all POIs" android:id="@+id/listofpois"/>
     <item android:title="@string/prefsactivity" android:id="@+id/prefsactivity"/>
 </menu>

@@ -21,7 +21,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".addPOI" />
-        <activity android:name=".MyPrefsActivity"></activity>
+        <activity android:name=".MyPrefsActivity" />
+        <activity android:name=".PoiListActivity" />
+        <fragment android:name=".PoiListFragment" />
+        <fragment android:name=".MapFragment"></fragment>
     </application>
 
 </manifest>
