@@ -49,6 +49,8 @@ public class MainActivity extends Activity implements POIsInterface {
     //private MapView mv;
     //private ItemizedIconOverlay<OverlayItem> items;
     private ArrayList<PointOfInterest> POIsList;
+    private double lastLatitude;
+    private double lastLongitude;
     //private MyLocationNewOverlay mLocationOverlay;
     private static final String POIsListFileName = "pois.csv";
 
@@ -62,9 +64,22 @@ public class MainActivity extends Activity implements POIsInterface {
         //set map, zoom and center
         setContentView(R.layout.activity_main);
         //mv = (MapView) findViewById(R.id.map1);
-
+        boolean res = savedInstanceState != null;
         //initialize the list of Points of Interest
-        this.POIsList = new ArrayList<>();
+        //Toast.makeText(this, "FLAGEEEEEEEEEEEEEEEEEEEELO +savedInstanceState!=null ->" + res + "savedInstanceState.isEmpty()->" + savedInstanceState.isEmpty(),
+        //        Toast.LENGTH_LONG).show();
+        if (savedInstanceState != null && !savedInstanceState.isEmpty()){
+            Toast.makeText(this, "poisList LOADED FROM BUNDLE ",
+                    Toast.LENGTH_LONG).show();
+            this.POIsList = savedInstanceState.getParcelableArrayList("poisList");
+            this.lastLatitude = savedInstanceState.getDouble("lat");
+            this.lastLongitude = savedInstanceState.getDouble("lon");
+        }else{
+            this.POIsList = new ArrayList<>();
+            this.lastLatitude = 50.9319;
+            this.lastLongitude = -1.4011;
+        }
+
 
         //initialize the list of OverlayItems (POIs) over the map
          //this.items = new ItemizedIconOverlay<OverlayItem>(this, new ArrayList<OverlayItem>(), null);
@@ -329,6 +344,11 @@ public class MainActivity extends Activity implements POIsInterface {
         }
     }
 
+    //task 8, to allow the mapfragment update the list of items when MainActivity is re-created
+    public void displayPOIs() {
+        displayPOIs(this.POIsList);
+    }
+
     //task 5
     public void displayPOIs(List<PointOfInterest> list){
         //modified for using inside fragments at task 8
@@ -357,13 +377,35 @@ public class MainActivity extends Activity implements POIsInterface {
         }
 
     }
-
+/*
     //task 3
     @Override
     protected void onDestroy() {
         super.onDestroy();
         savePOIs(POIsListFileName, POIsList);
     }
+*/
+
+    //task 3
+    @Override
+    protected void onPause() {
+        super.onDestroy();
+        savePOIs(POIsListFileName, POIsList);
+    }
+
+    //to keep the poisList when screen rotates
+    @Override
+    public void onSaveInstanceState (Bundle savedInstanceState)
+    {
+        Toast.makeText(this, "poisList SAVED IN BUNDLE ",
+                Toast.LENGTH_LONG).show();
+        savedInstanceState.putParcelableArrayList("poisList", this.POIsList);
+        MapFragment mapFragment = (MapFragment)getFragmentManager().findFragmentById(R.id.mapFragment);
+        savedInstanceState.putDouble("lat", mapFragment.getLatitude());
+        savedInstanceState.putDouble("lon", mapFragment.getLongitude());
+
+    }
+
 
 
     //task 6, task 7
@@ -477,6 +519,11 @@ public class MainActivity extends Activity implements POIsInterface {
            // mapFragment.centerMap(latitude, longitude);
         //}
 
+    }
+
+    //task 8 --> to allow center of the map is not changed when screen is rotated
+    public void centerMap(){
+        receiveLocation(this.lastLatitude, this.lastLongitude);
     }
 
     //when long click add a new POI within MapFragment-->this method is used to launch addPOI activity from here

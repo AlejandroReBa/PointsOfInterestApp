@@ -65,7 +65,8 @@ public class MapFragment extends Fragment implements LocationListener {
         mv = (MapView) getView().findViewById(R.id.map1);
         mv.getController().setZoom(14);
         mv.setBuiltInZoomControls(true);
-        mv.getController().setCenter(new GeoPoint(50.9319, -1.4011));
+        //mv.getController().setCenter(new GeoPoint(50.9319, -1.4011));
+        ((MainActivity)getActivity()).centerMap();
 
         //add the MyLocation Overlay to track the position of the user
         this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(getActivity()), mv);
@@ -124,9 +125,6 @@ public class MapFragment extends Fragment implements LocationListener {
             }
         };
 
-        //initialize the list of OverlayItems (POIs) over the map
-        this.items = new ItemizedIconOverlay<OverlayItem>(getActivity(), new ArrayList<OverlayItem>(), markerGestureListener);
-
         //initialize type of markers
         this.markersType = new HashMap<>();
         markersType.put("hotel", getResources().getDrawable(R.drawable.hotel));
@@ -139,7 +137,12 @@ public class MapFragment extends Fragment implements LocationListener {
         markersType.put("mountain", getResources().getDrawable(R.drawable.mountain));
         markersType.put("pub", getResources().getDrawable(R.drawable.pub));
 
-
+        //initialize the list of OverlayItems (POIs) over the map
+        //item list is updated each time PoisList in MainActivity changes. Therefore if we reinitialize
+        //here, when screen rotates, MainActivity saved and re-read the PoisList from bundle,
+        //but items would be clearer, no matching the actual state of pois.
+        this.items = new ItemizedIconOverlay<OverlayItem>(getActivity(), new ArrayList<OverlayItem>(), markerGestureListener);
+        ((MainActivity)getActivity()).displayPOIs();
 
         //Toast.makeText(getActivity(), "onActivityCreated has finished + isVisible=" + this.isVisible(), Toast.LENGTH_LONG).show();
     }
@@ -185,7 +188,7 @@ public class MapFragment extends Fragment implements LocationListener {
     }
 
     public void addItem(String name, String type, String description, Double lat, Double lon){
-        OverlayItem newItem = new OverlayItem(name,type + " - " + description, new GeoPoint(lat,lon));
+        OverlayItem newItem = new OverlayItem(name, name + " - " + type + " - " + description, new GeoPoint(lat,lon));
         // method to set marker..
         setMarker(newItem,type);
         items.addItem(newItem);
