@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -28,6 +29,8 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 //task 8
 public class MapFragment extends Fragment implements LocationListener {
@@ -35,6 +38,9 @@ public class MapFragment extends Fragment implements LocationListener {
     private MapView mv;
     private MyLocationNewOverlay mLocationOverlay;
     private ItemizedIconOverlay<OverlayItem> items;
+    //to display custom markets
+    private ItemizedIconOverlay.OnItemGestureListener<OverlayItem> markerGestureListener;
+    private Map<String,Drawable> markersType;
 
 
     @Override
@@ -60,9 +66,6 @@ public class MapFragment extends Fragment implements LocationListener {
         mv.getController().setZoom(14);
         mv.setBuiltInZoomControls(true);
         mv.getController().setCenter(new GeoPoint(50.9319, -1.4011));
-
-        //initialize the list of OverlayItems (POIs) over the map
-        this.items = new ItemizedIconOverlay<OverlayItem>(getActivity(), new ArrayList<OverlayItem>(), null);
 
         //add the MyLocation Overlay to track the position of the user
         this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(getActivity()), mv);
@@ -105,6 +108,39 @@ public class MapFragment extends Fragment implements LocationListener {
                     setPositiveButton("OK", null).show();
         }
 
+        //listener for single and long press tap up
+        markerGestureListener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>()
+        {
+            public boolean onItemLongPress(int i, OverlayItem item)
+            {
+                Toast.makeText(getActivity(), item.getSnippet(), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
+            public boolean onItemSingleTapUp(int i, OverlayItem item)
+            {
+                Toast.makeText(getActivity(), item.getSnippet(), Toast.LENGTH_LONG).show();
+                return true;
+            }
+        };
+
+        //initialize the list of OverlayItems (POIs) over the map
+        this.items = new ItemizedIconOverlay<OverlayItem>(getActivity(), new ArrayList<OverlayItem>(), markerGestureListener);
+
+        //initialize type of markers
+        this.markersType = new HashMap<>();
+        markersType.put("hotel", getResources().getDrawable(R.drawable.hotel));
+        markersType.put("city", getResources().getDrawable(R.drawable.marker));
+        markersType.put("town", getResources().getDrawable(R.drawable.town));
+        markersType.put("historical site", getResources().getDrawable(R.drawable.historicalsite));
+        markersType.put("bar", getResources().getDrawable(R.drawable.barcafe));
+        markersType.put("restaurant", getResources().getDrawable(R.drawable.restaurant));
+        markersType.put("beach", getResources().getDrawable(R.drawable.beach));
+        markersType.put("mountain", getResources().getDrawable(R.drawable.mountain));
+        markersType.put("pub", getResources().getDrawable(R.drawable.pub));
+
+
+
         //Toast.makeText(getActivity(), "onActivityCreated has finished + isVisible=" + this.isVisible(), Toast.LENGTH_LONG).show();
     }
 
@@ -136,7 +172,7 @@ public class MapFragment extends Fragment implements LocationListener {
 
     public void centerMap(double latitude, double longitude){
         this.mv.getController().setCenter(new GeoPoint(latitude,longitude));
-        this.mv.getController().setZoom(18);
+        this.mv.getController().setZoom(16);
         Toast.makeText(getActivity(), "Map setted to the new position and isVisible " + this.isVisible(), Toast.LENGTH_LONG).show();
     }
 
@@ -150,17 +186,27 @@ public class MapFragment extends Fragment implements LocationListener {
 
     public void addItem(String name, String type, String description, Double lat, Double lon){
         OverlayItem newItem = new OverlayItem(name,type + " - " + description, new GeoPoint(lat,lon));
+        // method to set marker..
+        setMarker(newItem,type);
         items.addItem(newItem);
         mv.getOverlays().add(items);
         //refresh the map in order to show the new POI immediately
         mv.invalidate();
 
+        /*
         Toast.makeText(getActivity(), "POI added -> name: " + name + ", type: " + type +
                         ", lat: " + lat + ", lon: " + lon + " description: " + description,
                 Toast.LENGTH_LONG).show();
+        */
     }
 
     public void removeItems(){
         this.items.removeAllItems();
+    }
+
+    private void setMarker(OverlayItem item, String type){
+        if (this.markersType.containsKey(type)){
+            item.setMarker(this.markersType.get(type));
+        }
     }
 }
