@@ -66,7 +66,7 @@ public class MapFragment extends Fragment implements LocationListener {
         mv.getController().setZoom(14);
         mv.setBuiltInZoomControls(true);
         //mv.getController().setCenter(new GeoPoint(50.9319, -1.4011));
-        ((MainActivity)getActivity()).centerMap();
+        ((MainActivity)getActivity()).centerMapZoom();
 
         //add the MyLocation Overlay to track the position of the user
         this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(getActivity()), mv);
@@ -179,6 +179,10 @@ public class MapFragment extends Fragment implements LocationListener {
         Toast.makeText(getActivity(), "Map setted to the new position and isVisible " + this.isVisible(), Toast.LENGTH_LONG).show();
     }
 
+    public void changeZoom(int zoom){
+        this.mv.getController().setZoom(zoom);
+    }
+
     public double getLatitude(){
         return this.mv.getMapCenter().getLatitude();
     }
@@ -186,6 +190,11 @@ public class MapFragment extends Fragment implements LocationListener {
     public double getLongitude(){
         return this.mv.getMapCenter().getLongitude();
     }
+
+    public int getZoomLevel() {
+        return this.mv.getZoomLevel();
+    }
+
 
     public void addItem(String name, String type, String description, Double lat, Double lon){
         OverlayItem newItem = new OverlayItem(name, name + " - " + type + " - " + description, new GeoPoint(lat,lon));

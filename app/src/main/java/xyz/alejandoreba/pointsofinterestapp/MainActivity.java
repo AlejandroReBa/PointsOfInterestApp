@@ -51,6 +51,7 @@ public class MainActivity extends Activity implements POIsInterface {
     private ArrayList<PointOfInterest> POIsList;
     private double lastLatitude;
     private double lastLongitude;
+    private int lastZoom;
     //private MyLocationNewOverlay mLocationOverlay;
     private static final String POIsListFileName = "pois.csv";
 
@@ -74,10 +75,12 @@ public class MainActivity extends Activity implements POIsInterface {
             this.POIsList = savedInstanceState.getParcelableArrayList("poisList");
             this.lastLatitude = savedInstanceState.getDouble("lat");
             this.lastLongitude = savedInstanceState.getDouble("lon");
+            this.lastZoom = savedInstanceState.getInt("zoomLevel");
         }else{
             this.POIsList = new ArrayList<>();
             this.lastLatitude = 50.9319;
             this.lastLongitude = -1.4011;
+            this.lastZoom = 15;
         }
 
 
@@ -389,7 +392,7 @@ public class MainActivity extends Activity implements POIsInterface {
     //task 3
     @Override
     protected void onPause() {
-        super.onDestroy();
+        super.onPause();
         savePOIs(POIsListFileName, POIsList);
     }
 
@@ -403,6 +406,7 @@ public class MainActivity extends Activity implements POIsInterface {
         MapFragment mapFragment = (MapFragment)getFragmentManager().findFragmentById(R.id.mapFragment);
         savedInstanceState.putDouble("lat", mapFragment.getLatitude());
         savedInstanceState.putDouble("lon", mapFragment.getLongitude());
+        savedInstanceState.putInt("zoomLevel", mapFragment.getZoomLevel());
 
     }
 
@@ -522,9 +526,14 @@ public class MainActivity extends Activity implements POIsInterface {
     }
 
     //task 8 --> to allow center of the map is not changed when screen is rotated
-    public void centerMap(){
-        receiveLocation(this.lastLatitude, this.lastLongitude);
+    public void centerMapZoom(){
+        MapFragment mapFragment = (MapFragment)getFragmentManager().findFragmentById(R.id.mapFragment);
+        // set its contents
+        mapFragment.centerMap(this.lastLatitude, this.lastLongitude);
+        mapFragment.changeZoom(this.lastZoom);
     }
+
+
 
     //when long click add a new POI within MapFragment-->this method is used to launch addPOI activity from here
     public void startActivityUsingIntent(Intent intent, int code){

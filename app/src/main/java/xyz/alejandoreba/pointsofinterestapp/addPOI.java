@@ -10,8 +10,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 public class addPOI extends Activity implements View.OnClickListener {
-    double lat;
-    double lon;
+    private double lat;
+    private double lon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
