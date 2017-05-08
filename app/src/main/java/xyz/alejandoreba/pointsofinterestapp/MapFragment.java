@@ -149,10 +149,12 @@ public class MapFragment extends Fragment implements LocationListener {
 
     @Override
     public void onLocationChanged(Location newLoc) {
-        Toast.makeText (getActivity(), "Location=" +
-                newLoc.getLatitude()+ " " +
-                newLoc.getLongitude() , Toast.LENGTH_LONG).show();
-        mv.getController().setCenter(new GeoPoint(newLoc.getLatitude(), newLoc.getLongitude()));
+        if(getActivity()!=null) {
+            Toast.makeText(getActivity(), "Location=" +
+                    newLoc.getLatitude() + " " +
+                    newLoc.getLongitude(), Toast.LENGTH_LONG).show();
+            mv.getController().setCenter(new GeoPoint(newLoc.getLatitude(), newLoc.getLongitude()));
+        }
     }
 
     @Override
