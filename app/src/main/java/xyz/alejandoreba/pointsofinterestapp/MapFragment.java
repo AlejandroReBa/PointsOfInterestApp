@@ -68,10 +68,12 @@ public class MapFragment extends Fragment implements LocationListener {
         //mv.getController().setCenter(new GeoPoint(50.9319, -1.4011));
         ((MainActivity)getActivity()).centerMapZoom();
 
+
         //add the MyLocation Overlay to track the position of the user
         this.mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(getActivity()), mv);
         this.mLocationOverlay.enableMyLocation();
         mv.getOverlays().add(this.mLocationOverlay);
+
 
         //listener for tap clicks on the map
         //when you click you intend the new activity to add a POI
@@ -101,6 +103,8 @@ public class MapFragment extends Fragment implements LocationListener {
         //
 
         //check GPS service is on
+
+        /*
         LocationManager mgr=(LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
         try {
             mgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
@@ -108,6 +112,9 @@ public class MapFragment extends Fragment implements LocationListener {
             new AlertDialog.Builder(getActivity()).setMessage("ERROR: we need permission for track your position").
                     setPositiveButton("OK", null).show();
         }
+        */
+
+
 
         //listener for single and long press tap up
         markerGestureListener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>()
@@ -127,6 +134,7 @@ public class MapFragment extends Fragment implements LocationListener {
 
         //initialize type of markers
         this.markersType = new HashMap<>();
+        
         markersType.put("hotel", getResources().getDrawable(R.drawable.hotel));
         markersType.put("city", getResources().getDrawable(R.drawable.marker));
         markersType.put("town", getResources().getDrawable(R.drawable.town));
