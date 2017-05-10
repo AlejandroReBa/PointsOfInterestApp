@@ -468,7 +468,7 @@ public class MainActivity extends Activity implements POIsInterface {
                     out.write(postData.getBytes());
                     InputStream in = conn.getInputStream();
                     if (conn.getResponseCode() == 200) {
-                        return "POI has been added to the web sucessfully";
+                        return "POI has been added to the web successfully";
                     } else {
                         return "HTTP ERROR: " + conn.getResponseCode();
                     }
