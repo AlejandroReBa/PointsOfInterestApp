@@ -8,7 +8,6 @@ import java.util.ArrayList;
 
 //task 8
 public interface POIsInterface {
-
     ArrayList<PointOfInterest> getPOIsList();
     void receiveLocation (double latitude, double longitude);
 }

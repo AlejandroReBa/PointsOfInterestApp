@@ -10,7 +10,6 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:id="@+id/poiListFragment">
-
     </fragment>
 
     <fragment class="xyz.alejandoreba.pointsofinterestapp.MapFragment"
@@ -18,8 +17,5 @@
         android:layout_height="match_parent"
         android:layout_weight="2"
         android:id="@+id/mapFragment">
-
     </fragment>
-
-
 </LinearLayout>

@@ -65,10 +65,8 @@ public class MainActivity extends Activity implements POIsInterface {
         //set map, zoom and center
         setContentView(R.layout.activity_main);
         //mv = (MapView) findViewById(R.id.map1);
-        boolean res = savedInstanceState != null;
+
         //initialize the list of Points of Interest
-        //Toast.makeText(this, "FLAGEEEEEEEEEEEEEEEEEEEELO +savedInstanceState!=null ->" + res + "savedInstanceState.isEmpty()->" + savedInstanceState.isEmpty(),
-        //        Toast.LENGTH_LONG).show();
         if (savedInstanceState != null && !savedInstanceState.isEmpty()){
             Toast.makeText(this, "poisList LOADED FROM BUNDLE ",
                     Toast.LENGTH_LONG).show();
@@ -354,7 +352,6 @@ public class MainActivity extends Activity implements POIsInterface {
 
     //task 5
     public void displayPOIs(List<PointOfInterest> list){
-        //modified for using inside fragments at task 8
         /*
         this.items.removeAllItems();
         for (PointOfInterest poi : list){
@@ -418,12 +415,11 @@ public class MainActivity extends Activity implements POIsInterface {
     {
         //public String doInBackground(Void... unused)
         public String doInBackground(String... params)
-        {
+            {
             HttpURLConnection conn = null;
             try
             {   //task 6
-                if (params[0] != null && params[0] == "load") {
-                    //URL url = new URL("http://www.free-map.org.uk/course/mad/ws/get.php?year=17&username=user002&format=json ");
+                if (params[0] != null && params[0].equals("load")) {
                     String urlstring = "http://www.free-map.org.uk/course/mad/ws/get.php?year=17&username=user002&format=json";
                     URL url = new URL(urlstring);
 
@@ -507,22 +503,6 @@ public class MainActivity extends Activity implements POIsInterface {
         MapFragment mapFragment = (MapFragment)getFragmentManager().findFragmentById(R.id.mapFragment);
         // set its contents
         mapFragment.centerMap(latitude, longitude);
-
-        /*
-        if (mapFragment == null || !mapFragment.isInLayout())
-        {
-            Intent intent = new Intent (this, SecondaryActivity.class);
-            intent.putExtra("latitude", latitude);
-            intent.putExtra("longitude", longitude);
-            startActivity(intent);
-        }
-        else
-        {
-        */
-            // set its contents
-           // mapFragment.centerMap(latitude, longitude);
-        //}
-
     }
 
     //task 8 --> to allow center of the map is not changed when screen is rotated

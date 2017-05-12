@@ -17,10 +17,8 @@ import java.util.ArrayList;
 public class PoiListFragment extends ListFragment {
 
     String[] entries;
-    String[] entryValues;// = { "51.51, -0.1", "48.85, 2.34",
-                    //"40.75, -74.0"};
-    String[] locations;//= { "51.51, -0.1", "48.85, 2.34",
-           // "40.75, -74.0"};
+    String[] entryValues;
+    String[] locations;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,6 +62,7 @@ public class PoiListFragment extends ListFragment {
         }
     }
 
+    @Override
     public void onListItemClick(ListView lv, View v, int index, long id)
     {
         String[] loc = locations[index].split(",");
@@ -104,11 +103,5 @@ public class PoiListFragment extends ListFragment {
 
         SelectPOIAdapter selectPOIAdapter = new SelectPOIAdapter();
         setListAdapter(selectPOIAdapter);
-
-        /*
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_list_item_1, entries);
-        setListAdapter(adapter);
-        */
-
     }
 }

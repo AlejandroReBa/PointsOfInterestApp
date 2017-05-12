@@ -55,7 +55,6 @@ public class MapFragment extends Fragment implements LocationListener {
         return inflater.inflate(R.layout.fragment_map, parent);
     }
 
-    ///put mv = fdsfasdf a in the method create not before. after or whatever
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
@@ -85,7 +84,6 @@ public class MapFragment extends Fragment implements LocationListener {
 
             @Override
             public boolean longPressHelper(GeoPoint p) {
-                //Toast.makeText (MainActivity.this, "longPressHelper go go go", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(getActivity(), addPOI.class);
                 Bundle bundle = new Bundle();
                 bundle.putDouble("poilat", p.getLatitude());
@@ -146,13 +144,12 @@ public class MapFragment extends Fragment implements LocationListener {
         markersType.put("pub", getResources().getDrawable(R.drawable.pub));
 
         //initialize the list of OverlayItems (POIs) over the map
-        //item list is updated each time PoisList in MainActivity changes. Therefore if we reinitialize
+        //item list is updated each time PoisList in MainActivity changes. Therefore if we restart
         //here, when screen rotates, MainActivity saved and re-read the PoisList from bundle,
-        //but items would be clearer, no matching the actual state of pois.
+        //so we will have to call the method displayPOIs to refresh the map.
         this.items = new ItemizedIconOverlay<OverlayItem>(getActivity(), new ArrayList<OverlayItem>(), markerGestureListener);
         ((MainActivity)getActivity()).displayPOIs();
 
-        //Toast.makeText(getActivity(), "onActivityCreated has finished + isVisible=" + this.isVisible(), Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -186,7 +183,7 @@ public class MapFragment extends Fragment implements LocationListener {
     public void centerMap(double latitude, double longitude){
         this.mv.getController().setCenter(new GeoPoint(latitude,longitude));
         this.mv.getController().setZoom(16);
-        Toast.makeText(getActivity(), "Map setted to the new position and isVisible " + this.isVisible(), Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(), "Map setted to the new position", Toast.LENGTH_LONG).show();
     }
 
     public void changeZoom(int zoom){

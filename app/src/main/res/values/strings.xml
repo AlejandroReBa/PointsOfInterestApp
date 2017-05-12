@@ -33,4 +33,12 @@
 
     <string name="prefsactivity">Preferences</string>
 
+    <!--task 5-->
+    <string name="loadpois">Load POIs</string>
+
+    <!--task 6-->
+    <string name="loadpoisfromweb">Load POIs from WEB</string>
+
+    <!--task 8-->
+    <string name="listofpois">List of all POIs</string>
 </resources>
